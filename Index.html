@@ -1,606 +1,106 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ko">
- <head><script>window["__codeletBootstrap__"]=JSON.parse('{"A":"A","B":"20260827-03-dc2300d","C":{"Abril Fatface":"YACgEZbkUVE,0","Alfa Slab One":"YACgEYS9sJU,0","Anton":"YACgEcYqQ-A,0","Archivo":"YAHO2-t-jNE,0","Arial":"YAGyDvJ_4Ts,0","Bebas Neue":"YACgESME5ew,0","Bricolage Grotesque":"YAFyMcdwzpc,0","Canva Sans":"YAFLd8sKbwc,2","Caveat":"YALBs2ploWQ,0","Comic Sans MS":"YAHO2VMiyZo,0","Cormorant Garamond":"YAFdJhX-538,0","Courier New":"YAGzXiGs0_8,0","DM Sans":"YAD1aU3sLnI,0","DM Serif Display":"YAD1aYG82rc,0","Forum":"YACgEcnnqB4,0","Fraunces":"YAEul-FRQw4,0","Georgia":"YAGzXkO0pEM,0","Helvetica Neue":"YAFcf6CtJfI,0","Impact":"YAFcfnjI7Vk,0","Inter":"YAFdJvSyp_k,3","Iowan Old Style":"YAGNIFa8j9o,0","Jacques Francois":"YAHO2a5g66Q,0","JetBrains Mono":"YAFdJksXcAk,0","Libre Baskerville":"YACgEUFdPdA,0","Manrope":"YAHO2b2feC4,0","Merriweather":"YACgEXvHxxs,0","Montserrat":"YADLjI9qxTA,0","Nunito":"YACgEX8C5Gg,0","Oleo Script":"YACgEQQ14jI,0","Phantom Sans":"YAHO2E8Pb88,0","Playfair Display":"YACgEYmuCJE,0","Poppins":"YAFdJjbTu24,1","Press Start 2P":"YAFyGr-8pmQ,0","Quicksand":"YADWjpfPmdk,0","Raleway":"YACgEVg3xZg,0","Segoe UI":"YAHNdRD1Klw,0","Source Sans 3":"YAG4lO1Mj10,0","Spectral":"YAHO2rVUHIM,0","Times New Roman":"YAGzXW3gftg,0","Times":"YAGzXW3gftg,0","Ubuntu":"YACgERDU--Q,0","Work Sans":"YAGXhLOKv44,0","Yellowtail":"YACgEYG4kG4,0","ui-monospace":"YADlN8CFZ8Q,0","ui-sans-serif":"YACkoN-xg4g,0"}}');</script><script src="/_sdk/50d846425a1e5082.telemetry_sdk.js" integrity="sha512-Otbex+ztlVbcEGql0rXGd/3E3ee/hqAntg6DeuUEMG6pIPbXGOSvZbFZVzknAXi1tH/itQ+ijEhOTr2aWj6CXg=="></script>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>조선 시대 탐구 퀴즈</title>
-  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
-  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Eczar:wght@600;700&amp;family=Noto+Sans+KR:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --ink: #172a3a;
-      --green: #123e38;
-      --gold: #d39a38;
-      --paper: #fffdf7;
-      --coral: #bf5140;
-    }
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>가상 회로 설계 및 옴의 법칙 탐구 실험실</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0f172a; color: #f8fafc; font-family: 'Inter', sans-serif; }
+        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); }
+        .bulb-glow { transition: filter 0.3s ease; }
+        
+        .wire-container { position: relative; overflow: hidden; height: 10px; width: 100%; background: #334155; border-radius: 5px; margin: 20px 0; }
+        .electron { position: absolute; width: 8px; height: 8px; background: #60a5fa; border-radius: 50%; top: 1px; left: -10px; box-shadow: 0 0 8px #60a5fa; }
+        
+        @keyframes flow {
+            0% { left: -10px; }
+            100% { left: 100%; }
+        }
+        .animate-flow { animation: flow linear infinite; }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <div class="max-w-5xl mx-auto">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-yellow-400">옴의 법칙 탐구 실험실</h1>
+            <p class="text-slate-400">전압과 저항의 변화가 전자 이동과 전류에 미치는 영향을 관찰하세요.</p>
+        </header>
 
-    * { box-sizing: border-box; }
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-2 glass p-6 rounded-2xl border border-slate-700">
+                <div class="flex gap-4 mb-6">
+                    <button onclick="setMode('series')" id="btn-series" class="bg-blue-600 px-4 py-2 rounded-lg font-bold">직렬 회로</button>
+                    <button onclick="setMode('parallel')" id="btn-parallel" class="bg-slate-700 px-4 py-2 rounded-lg font-bold">병렬 회로</button>
+                </div>
+                
+                <div id="circuit-viz" class="h-64 flex flex-col items-center justify-center bg-slate-900 rounded-xl border border-slate-800 p-8">
+                    <div class="flex gap-12 mb-4">
+                        <div id="bulb1" class="w-16 h-16 rounded-full bg-slate-700 bulb-glow border-4 border-slate-600 shadow-lg"></div>
+                        <div id="bulb2" class="w-16 h-16 rounded-full bg-slate-700 bulb-glow border-4 border-slate-600 shadow-lg"></div>
+                    </div>
+                    <div class="wire-container">
+                        <div id="electron" class="electron"></div>
+                    </div>
+                </div>
+            </div>
 
-    body {
-      width: 100%;
-      min-width: 0;
-      margin: 0;
-      color: var(--ink);
-      font-family: "Noto Sans KR", sans-serif;
-    }
-
-    button { font-family: inherit; }
-
-    .site-quiz-shell {
-      width: 100%;
-      min-width: 0;
-      padding: 20px;
-      background-image:
-        radial-gradient(circle at 6% 4%, rgba(234, 203, 128, .6) 0 80px, transparent 81px),
-        radial-gradient(circle at 98% 100%, rgba(156, 190, 177, .42) 0 115px, transparent 116px);
-    }
-
-    .quiz-frame {
-      width: 100%;
-      max-width: 940px;
-      margin: 0 auto;
-    }
-
-    .hero-banner {
-      display: grid;
-      grid-template-columns: minmax(0, 1.35fr) minmax(250px, .75fr);
-      overflow: hidden;
-      border: 4px solid var(--green);
-      border-radius: 24px;
-      box-shadow: 7px 7px 0 rgba(18, 62, 56, .16);
-    }
-
-    .hero-copy {
-      position: relative;
-      min-width: 0;
-      padding: 32px clamp(24px, 4vw, 48px);
-      overflow: hidden;
-      background: var(--green);
-      color: #fff9eb;
-    }
-
-    .hero-copy::after {
-      content: "朝鮮";
-      position: absolute;
-      right: 18px;
-      bottom: -28px;
-      color: rgba(255, 255, 255, .08);
-      font-family: "Eczar", serif;
-      font-size: 92px;
-      line-height: 1;
-      pointer-events: none;
-    }
-
-    .eyebrow {
-      position: relative;
-      z-index: 1;
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      margin: 0 0 13px;
-      font-size: 13px;
-      font-weight: 800;
-      letter-spacing: .08em;
-    }
-
-    .hero-title {
-      position: relative;
-      z-index: 1;
-      margin: 0;
-      font-family: "Eczar", "Noto Sans KR", serif;
-      font-size: clamp(32px, 5vw, 50px);
-      line-height: 1.12;
-      letter-spacing: -.04em;
-    }
-
-    .hero-description {
-      position: relative;
-      z-index: 1;
-      max-width: 510px;
-      margin: 14px 0 0;
-      line-height: 1.7;
-      word-break: keep-all;
-    }
-
-    .hero-image {
-      display: block;
-      width: 100%;
-      min-height: 230px;
-      height: 100%;
-      object-fit: cover;
-      filter: saturate(.8) sepia(.12);
-    }
-
-    .quiz-area {
-      width: 100%;
-      margin-top: 24px;
-      overflow: hidden;
-      border: 1px solid rgba(23, 42, 58, .15);
-      border-radius: 24px;
-      background: rgba(255, 253, 247, .96);
-      box-shadow: 0 14px 35px rgba(28, 46, 47, .11);
-    }
-
-    .status-strip {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 14px;
-      padding: 15px 22px;
-      border-bottom: 1px solid rgba(23, 42, 58, .13);
-      background: #efe1c4;
-    }
-
-    .progress-dots {
-      display: flex;
-      flex-wrap: nowrap;
-      gap: 7px;
-      align-items: center;
-    }
-
-    .dot {
-      display: inline-block;
-      width: 12px;
-      height: 12px;
-      flex: 0 0 12px;
-      border-radius: 50%;
-      background: #c9b995;
-      transition: background .2s ease, transform .2s ease;
-    }
-
-    .dot.current { background: var(--green); transform: scale(1.14); }
-    .dot.done { background: var(--gold); }
-
-    .scoreboard {
-      margin: 0;
-      color: var(--green);
-      font-size: 14px;
-      font-weight: 800;
-      white-space: nowrap;
-    }
-
-    .question-panel,
-    .result-screen {
-      padding: clamp(26px, 5vw, 46px);
-    }
-
-    .question-panel[hidden],
-    .result-screen[hidden],
-    .feedback-variant[hidden],
-    .action-button[hidden] {
-      display: none;
-    }
-
-    .question-panel {
-      animation: reveal .32s ease both;
-    }
-
-    .question-number {
-      margin: 0 0 12px;
-      color: #a35d14;
-      font-size: 14px;
-      font-weight: 800;
-      letter-spacing: .04em;
-    }
-
-    .question-title {
-      margin: 0;
-      font-size: clamp(22px, 3.3vw, 30px);
-      font-weight: 800;
-      line-height: 1.48;
-      letter-spacing: -.035em;
-      word-break: keep-all;
-    }
-
-    .answer-list {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-      margin-top: 27px;
-    }
-
-    .answer-button {
-      min-width: 0;
-      min-height: 70px;
-      padding: 14px 17px;
-      border: 2px solid #d8cfbe;
-      border-radius: 14px;
-      background: var(--paper);
-      color: var(--ink);
-      cursor: pointer;
-      font-size: 16px;
-      font-weight: 700;
-      line-height: 1.45;
-      text-align: left;
-      word-break: keep-all;
-      transition: transform .18s ease, border-color .18s ease, background .18s ease, box-shadow .18s ease;
-    }
-
-    .answer-button:hover:not(:disabled) {
-      border-color: var(--green);
-      box-shadow: 0 4px 0 rgba(18, 62, 56, .13);
-      transform: translateY(-2px);
-    }
-
-    .answer-button:disabled { cursor: default; }
-
-    .answer-button.correct {
-      border-color: #237765;
-      background: #dff1e7;
-      color: #154d41;
-    }
-
-    .answer-button.wrong {
-      border-color: var(--coral);
-      background: #fbe2dc;
-      color: #80362a;
-    }
-
-    .feedback-box { margin-top: 21px; }
-
-    .feedback-content {
-      display: flex;
-      gap: 11px;
-      align-items: flex-start;
-      padding: 16px 17px;
-      border-left: 5px solid #237765;
-      border-radius: 12px;
-      background: #e8f1ea;
-      color: #17483d;
-    }
-
-    .feedback-content.wrong-feedback {
-      border-left-color: var(--coral);
-      background: #f9e8df;
-      color: #723326;
-    }
-
-    .feedback-message {
-      margin: 0;
-      font-size: 15px;
-      font-weight: 600;
-      line-height: 1.65;
-      word-break: keep-all;
-    }
-
-    .next-row {
-      display: flex;
-      justify-content: flex-end;
-      margin-top: 23px;
-    }
-
-    .action-button {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      min-height: 46px;
-      padding: 11px 18px;
-      border: 0;
-      border-radius: 12px;
-      cursor: pointer;
-      font-size: 16px;
-      font-weight: 800;
-      transition: transform .18s ease, filter .18s ease, box-shadow .18s ease;
-    }
-
-    .action-button:hover {
-      box-shadow: 0 4px 0 rgba(23, 42, 58, .18);
-      filter: brightness(1.04);
-      transform: translateY(-2px);
-    }
-
-    .answer-button:focus-visible,
-    .action-button:focus-visible {
-      outline: 3px solid #e4a53d;
-      outline-offset: 3px;
-    }
-
-    .result-screen {
-      text-align: center;
-      animation: reveal .35s ease both;
-    }
-
-    .result-medallion {
-      display: grid;
-      width: 88px;
-      height: 88px;
-      margin: 0 auto 20px;
-      place-items: center;
-      border: 5px solid #fff7e4;
-      border-radius: 50%;
-      background: #e7bd61;
-      box-shadow: 0 0 0 3px #bd7d22;
-      color: var(--green);
-    }
-
-    .result-title {
-      margin: 0;
-      font-family: "Eczar", "Noto Sans KR", serif;
-      font-size: clamp(29px, 5vw, 43px);
-      line-height: 1.16;
-    }
-
-    .result-score {
-      margin: 16px 0 8px;
-      color: var(--green);
-      font-size: clamp(40px, 8vw, 62px);
-      font-weight: 900;
-      line-height: 1;
-      letter-spacing: -.06em;
-    }
-
-    .result-message {
-      max-width: 510px;
-      margin: 14px auto 27px;
-      color: #4a5860;
-      font-size: 16px;
-      line-height: 1.7;
-      word-break: keep-all;
-    }
-
-    @keyframes reveal {
-      from { opacity: 0; transform: translateY(7px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    @media (max-width: 640px) {
-      .site-quiz-shell { padding: 12px; }
-      .hero-banner { grid-template-columns: 1fr; }
-      .hero-image { min-height: 170px; max-height: 210px; }
-      .status-strip { padding: 14px 16px; }
-      .answer-list { grid-template-columns: 1fr; }
-      .question-panel, .result-screen { padding: 27px 20px; }
-    }
-  </style>
-  <script src="/_sdk/b3bf9e8ac58e6ad6.data_sdk.js" type="text/javascript" integrity="sha512-otc1u9NYq9Ms5Jt//7vmhrrqR5CLPr8Jdgs6741gqniClfLMcfmC+jK/cKuQdhLv6G0esJ/FzaMS9tv0T/vj/Q=="></script>
-  <script src="/_sdk/a27879be4562f807.resizing_sdk.js" type="text/javascript" integrity="sha512-trcxRwz+QLrzK0Dqg95xqVRryR7WtWui2YopXyzOIr3WMde3j/xCRgT63/b/EAg7klDsAOuHzoRgoryhwm8QFw=="></script>
- </head>
- <body data-template-id="__page-root">
-  <div class="site-quiz-shell">
-   <main class="quiz-frame">
-    <header class="hero-banner">
-     <section class="hero-copy">
-      <p data-template-id="hero-eyebrow" class="canva-text eyebrow"><i data-lucide="landmark" aria-hidden="true" style="width:17px;height:17px"></i></p>
-      <h1 data-template-id="hero-title" class="canva-text hero-title"></h1>
-      <p data-template-id="hero-description" class="canva-text hero-description"></p>
-     </section><img data-template-id="hero-image" class="canva-image hero-image" loading="lazy">
-    </header>
-    <section class="quiz-area" aria-label="조선 시대 퀴즈">
-     <div class="status-strip">
-      <div class="progress-dots" aria-label="문제 진행 상황"><span class="dot current" data-dot="0"></span> <span class="dot" data-dot="1"></span> <span class="dot" data-dot="2"></span> <span class="dot" data-dot="3"></span> <span class="dot" data-dot="4"></span>
-      </div>
-      <p class="scoreboard" aria-live="polite"><span id="progress-text">1 / 5</span> · <span id="score-text">점수 0점</span></p>
-     </div>
-     <section class="question-panel" data-question="0">
-      <p data-template-id="q1-number" class="canva-text question-number"></p>
-      <h2 data-template-id="q1-title" class="canva-text question-title"></h2>
-      <div class="answer-list" role="group" aria-label="1번 문제 선택지"><button data-template-id="q1-a1" class="canva-button answer-button" type="button" data-correct="false"></button> <button data-template-id="q1-a2" class="canva-button answer-button" type="button" data-correct="true"></button> <button data-template-id="q1-a3" class="canva-button answer-button" type="button" data-correct="false"></button> <button data-template-id="q1-a4" class="canva-button answer-button" type="button" data-correct="false"></button>
-      </div>
-      <div class="feedback-box" aria-live="polite">
-       <div class="feedback-variant" data-feedback="correct" hidden>
-        <div class="feedback-content">
-         <i data-lucide="circle-check" aria-hidden="true" style="width:21px;height:21px;flex:none"></i>
-         <p data-template-id="q1-correct" class="canva-text feedback-message"></p>
+            <div class="glass p-6 rounded-2xl border border-slate-700 space-y-6">
+                <div>
+                    <label class="block text-sm mb-2">전압 (V): <span id="vVal" class="text-yellow-400 font-bold">10</span>V</label>
+                    <input type="range" id="vSlider" min="1" max="50" value="10" class="w-full accent-yellow-400" oninput="updateCircuit()">
+                </div>
+                <div>
+                    <label class="block text-sm mb-2">저항 1 (Ω): <span id="r1Val" class="text-blue-400 font-bold">10</span>Ω</label>
+                    <input type="range" id="r1Slider" min="1" max="100" value="10" class="w-full accent-blue-400" oninput="updateCircuit()">
+                </div>
+                <div id="r2-control">
+                    <label class="block text-sm mb-2">저항 2 (Ω): <span id="r2Val" class="text-blue-400 font-bold">10</span>Ω</label>
+                    <input type="range" id="r2Slider" min="1" max="100" value="10" class="w-full accent-blue-400" oninput="updateCircuit()">
+                </div>
+                <div class="pt-4 border-t border-slate-700 text-center">
+                    <div class="text-2xl font-bold text-green-400" id="currentVal">0.00 A</div>
+                    <div class="text-sm text-slate-400">흐르는 전류 (I = V/R)</div>
+                </div>
+            </div>
         </div>
-       </div>
-       <div class="feedback-variant" data-feedback="wrong" hidden>
-        <div class="feedback-content wrong-feedback">
-         <i data-lucide="circle-x" aria-hidden="true" style="width:21px;height:21px;flex:none"></i>
-         <p data-template-id="q1-wrong" class="canva-text feedback-message"></p>
-        </div>
-       </div>
-      </div>
-      <div class="next-row">
-       <button data-template-id="next-1" class="canva-button action-button" type="button" hidden><i data-lucide="arrow-right" aria-hidden="true" style="width:18px;height:18px"></i></button>
-      </div>
-     </section>
-     <section class="question-panel" data-question="1" hidden>
-      <p data-template-id="q2-number" class="canva-text question-number"></p>
-      <h2 data-template-id="q2-title" class="canva-text question-title"></h2>
-      <div class="answer-list" role="group" aria-label="2번 문제 선택지"><button data-template-id="q2-a1" class="canva-button answer-button" type="button" data-correct="false"></button> <button data-template-id="q2-a2" class="canva-button answer-button" type="button" data-correct="false"></button> <button data-template-id="q2-a3" class="canva-button answer-button" type="button" data-correct="true"></button> <button data-template-id="q2-a4" class="canva-button answer-button" type="button" data-correct="false"></button>
-      </div>
-      <div class="feedback-box" aria-live="polite">
-       <div class="feedback-variant" data-feedback="correct" hidden>
-        <div class="feedback-content">
-         <i data-lucide="circle-check" aria-hidden="true" style="width:21px;height:21px;flex:none"></i>
-         <p data-template-id="q2-correct" class="canva-text feedback-message"></p>
-        </div>
-       </div>
-       <div class="feedback-variant" data-feedback="wrong" hidden>
-        <div class="feedback-content wrong-feedback">
-         <i data-lucide="circle-x" aria-hidden="true" style="width:21px;height:21px;flex:none"></i>
-         <p data-template-id="q2-wrong" class="canva-text feedback-message"></p>
-        </div>
-       </div>
-      </div>
-      <div class="next-row">
-       <button data-template-id="next-2" class="canva-button action-button" type="button" hidden><i data-lucide="arrow-right" aria-hidden="true" style="width:18px;height:18px"></i></button>
-      </div>
-     </section>
-     <section class="question-panel" data-question="2" hidden>
-      <p data-template-id="q3-number" class="canva-text question-number"></p>
-      <h2 data-template-id="q3-title" class="canva-text question-title"></h2>
-      <div class="answer-list" role="group" aria-label="3번 문제 선택지"><button data-template-id="q3-a1" class="canva-button answer-button" type="button" data-correct="false"></button> <button data-template-id="q3-a2" class="canva-button answer-button" type="button" data-correct="true"></button> <button data-template-id="q3-a3" class="canva-button answer-button" type="button" data-correct="false"></button> <button data-template-id="q3-a4" class="canva-button answer-button" type="button" data-correct="false"></button>
-      </div>
-      <div class="feedback-box" aria-live="polite">
-       <div class="feedback-variant" data-feedback="correct" hidden>
-        <div class="feedback-content">
-         <i data-lucide="circle-check" aria-hidden="true" style="width:21px;height:21px;flex:none"></i>
-         <p data-template-id="q3-correct" class="canva-text feedback-message"></p>
-        </div>
-       </div>
-       <div class="feedback-variant" data-feedback="wrong" hidden>
-        <div class="feedback-content wrong-feedback">
-         <i data-lucide="circle-x" aria-hidden="true" style="width:21px;height:21px;flex:none"></i>
-         <p data-template-id="q3-wrong" class="canva-text feedback-message"></p>
-        </div>
-       </div>
-      </div>
-      <div class="next-row">
-       <button data-template-id="next-3" class="canva-button action-button" type="button" hidden><i data-lucide="arrow-right" aria-hidden="true" style="width:18px;height:18px"></i></button>
-      </div>
-     </section>
-     <section class="question-panel" data-question="3" hidden>
-      <p data-template-id="q4-number" class="canva-text question-number"></p>
-      <h2 data-template-id="q4-title" class="canva-text question-title"></h2>
-      <div class="answer-list" role="group" aria-label="4번 문제 선택지"><button data-template-id="q4-a1" class="canva-button answer-button" type="button" data-correct="false"></button> <button data-template-id="q4-a2" class="canva-button answer-button" type="button" data-correct="false"></button> <button data-template-id="q4-a3" class="canva-button answer-button" type="button" data-correct="false"></button> <button data-template-id="q4-a4" class="canva-button answer-button" type="button" data-correct="true"></button>
-      </div>
-      <div class="feedback-box" aria-live="polite">
-       <div class="feedback-variant" data-feedback="correct" hidden>
-        <div class="feedback-content">
-         <i data-lucide="circle-check" aria-hidden="true" style="width:21px;height:21px;flex:none"></i>
-         <p data-template-id="q4-correct" class="canva-text feedback-message"></p>
-        </div>
-       </div>
-       <div class="feedback-variant" data-feedback="wrong" hidden>
-        <div class="feedback-content wrong-feedback">
-         <i data-lucide="circle-x" aria-hidden="true" style="width:21px;height:21px;flex:none"></i>
-         <p data-template-id="q4-wrong" class="canva-text feedback-message"></p>
-        </div>
-       </div>
-      </div>
-      <div class="next-row">
-       <button data-template-id="next-4" class="canva-button action-button" type="button" hidden><i data-lucide="arrow-right" aria-hidden="true" style="width:18px;height:18px"></i></button>
-      </div>
-     </section>
-     <section class="question-panel" data-question="4" hidden>
-      <p data-template-id="q5-number" class="canva-text question-number"></p>
-      <h2 data-template-id="q5-title" class="canva-text question-title"></h2>
-      <div class="answer-list" role="group" aria-label="5번 문제 선택지"><button data-template-id="q5-a1" class="canva-button answer-button" type="button" data-correct="true"></button> <button data-template-id="q5-a2" class="canva-button answer-button" type="button" data-correct="false"></button> <button data-template-id="q5-a3" class="canva-button answer-button" type="button" data-correct="false"></button> <button data-template-id="q5-a4" class="canva-button answer-button" type="button" data-correct="false"></button>
-      </div>
-      <div class="feedback-box" aria-live="polite">
-       <div class="feedback-variant" data-feedback="correct" hidden>
-        <div class="feedback-content">
-         <i data-lucide="circle-check" aria-hidden="true" style="width:21px;height:21px;flex:none"></i>
-         <p data-template-id="q5-correct" class="canva-text feedback-message"></p>
-        </div>
-       </div>
-       <div class="feedback-variant" data-feedback="wrong" hidden>
-        <div class="feedback-content wrong-feedback">
-         <i data-lucide="circle-x" aria-hidden="true" style="width:21px;height:21px;flex:none"></i>
-         <p data-template-id="q5-wrong" class="canva-text feedback-message"></p>
-        </div>
-       </div>
-      </div>
-      <div class="next-row">
-       <button data-template-id="show-result" class="canva-button action-button" type="button" hidden><i data-lucide="trophy" aria-hidden="true" style="width:18px;height:18px"></i></button>
-      </div>
-     </section>
-     <section id="result-screen" class="result-screen" hidden aria-live="polite">
-      <div class="result-medallion">
-       <i data-lucide="trophy" aria-hidden="true" style="width:42px;height:42px"></i>
-      </div>
-      <h2 data-template-id="result-title" class="canva-text result-title"></h2>
-      <p id="final-score" class="result-score"></p>
-      <p id="result-perfect" class="result-message" hidden>대단해요! 조선 시대의 핵심 내용을 아주 잘 이해하고 있어요.</p>
-      <p id="result-good" class="result-message" hidden>잘했어요! 틀린 문제의 해설을 한 번 더 읽어 보면 더 완벽해질 거예요.</p>
-      <p id="result-review" class="result-message" hidden>괜찮아요! 다시 풀며 세종 대왕, 한양, 이순신 장군을 중심으로 복습해 보세요.</p><button data-template-id="restart-button" class="canva-button action-button" type="button"><i data-lucide="rotate-ccw" aria-hidden="true" style="width:18px;height:18px"></i></button>
-     </section>
-    </section>
-   </main>
-  </div>
-  <script src="/_sdk/78f4024a6883f001.editing_sdk.js" integrity="sha512-5JijBqhu1bO2WHWN6CyZm84Pau82MCFCPVSKnBzLACwT41OSljts3eUyyrStRqJcWxLvdOq8SRK/JTh6l0y70Q=="></script>
-  <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      lucide.createIcons();
+    </div>
 
-      const panels = Array.from(document.querySelectorAll(".question-panel"));
-      const dots = Array.from(document.querySelectorAll(".dot"));
-      let currentQuestion = 0;
-      let score = 0;
+    <script>
+        let mode = 'series';
+        const electron = document.getElementById('electron');
 
-      function updateStatus() {
-        document.getElementById("progress-text").textContent = (currentQuestion + 1) + " / 5";
-        document.getElementById("score-text").textContent = "점수 " + score + "점";
+        function setMode(m) {
+            mode = m;
+            document.getElementById('btn-series').className = mode === 'series' ? 'bg-blue-600 px-4 py-2 rounded-lg font-bold' : 'bg-slate-700 px-4 py-2 rounded-lg font-bold';
+            document.getElementById('btn-parallel').className = mode === 'parallel' ? 'bg-blue-600 px-4 py-2 rounded-lg font-bold' : 'bg-slate-700 px-4 py-2 rounded-lg font-bold';
+            updateCircuit();
+        }
 
-        dots.forEach(function (dot, index) {
-          dot.classList.toggle("current", index === currentQuestion);
-          dot.classList.toggle("done", index < currentQuestion);
-        });
-      }
+        function updateCircuit() {
+            const v = parseFloat(document.getElementById('vSlider').value);
+            const r1 = parseFloat(document.getElementById('r1Slider').value);
+            const r2 = parseFloat(document.getElementById('r2Slider').value);
+            
+            document.getElementById('vVal').innerText = v;
+            document.getElementById('r1Val').innerText = r1;
+            document.getElementById('r2Val').innerText = r2;
 
-      function showQuestion(index) {
-        panels.forEach(function (panel, panelIndex) {
-          panel.hidden = panelIndex !== index;
-        });
-        currentQuestion = index;
-        updateStatus();
-      }
-
-      function selectAnswer(button) {
-        const panel = button.closest(".question-panel");
-        if (panel.dataset.answered === "true") return;
-
-        const isCorrect = button.dataset.correct === "true";
-        panel.dataset.answered = "true";
-
-        panel.querySelectorAll(".answer-button").forEach(function (answer) {
-          answer.disabled = true;
-          if (answer.dataset.correct === "true") answer.classList.add("correct");
-        });
-
-        if (!isCorrect) button.classList.add("wrong");
-
-        panel.querySelectorAll(".feedback-variant").forEach(function (feedback) {
-          feedback.hidden = feedback.dataset.feedback !== (isCorrect ? "correct" : "wrong");
-        });
-
-        panel.querySelector(".action-button").hidden = false;
-        if (isCorrect) score += 1;
-        updateStatus();
-      }
-
-      function showResults() {
-        panels.forEach(function (panel) { panel.hidden = true; });
-        document.getElementById("result-screen").hidden = false;
-        document.getElementById("final-score").textContent = score + " / 5";
-
-        document.getElementById("result-perfect").hidden = score !== 5;
-        document.getElementById("result-good").hidden = !(score >= 3 && score < 5);
-        document.getElementById("result-review").hidden = score >= 3;
-
-        dots.forEach(function (dot) {
-          dot.classList.remove("current");
-          dot.classList.add("done");
-        });
-      }
-
-      function restartQuiz() {
-        score = 0;
-        currentQuestion = 0;
-        document.getElementById("result-screen").hidden = true;
-
-        panels.forEach(function (panel) {
-          panel.dataset.answered = "false";
-          panel.querySelectorAll(".feedback-variant").forEach(function (feedback) {
-            feedback.hidden = true;
-          });
-          panel.querySelector(".action-button").hidden = true;
-          panel.querySelectorAll(".answer-button").forEach(function (answer) {
-            answer.disabled = false;
-            answer.classList.remove("correct", "wrong");
-          });
-        });
-
-        showQuestion(0);
-      }
-
-      document.querySelectorAll(".answer-button").forEach(function (button) {
-        button.addEventListener("click", function () { selectAnswer(button); });
-      });
-
-      document.getElementById("next-1").addEventListener("click", function () { showQuestion(1); });
-      document.getElementById("next-2").addEventListener("click", function () { showQuestion(2); });
-      document.getElementById("next-3").addEventListener("click", function () { showQuestion(3); });
-      document.getElementById("next-4").addEventListener("click", function () { showQuestion(4); });
-      document.getElementById("show-result").addEventListener("click", showResults);
-      document.getElementById("restart-button").addEventListener("click", restartQuiz);
-
-      updateStatus();
-    });
-  </script>
- </body>
+            let totalR = mode === 'series' ? (r1 + r2) : (r1 * r2) / (r1 + r2);
+            let i = v / totalR;
+            
+            document.getElementById('currentVal').innerText = i.toFixed(2) + " A";
+            
+            // Animation logic based on current
+            const speed = Math.max(0.5, 5 - i/2);
+            electron.style.animationDuration = `${speed}s`;
+            electron.classList.add('animate-flow');
+            
+            const brightness = Math.min(i * 10, 100);
+            document.getElementById('bulb1').style.filter = `brightness(${1 + brightness/50}) drop-shadow(0 0 ${brightness/2}px #fbbf24)`;
+            document.getElementById('bulb2').style.filter = `brightness(${1 + brightness/50}) drop-shadow(0 0 ${brightness/2}px #fbbf24)`;
+        }
+        updateCircuit();
+    </script>
+</body>
 </html>
