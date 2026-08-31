@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>가상 회로 설계 및 옴의 법칙 탐구 실험실</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0f172a; color: #f8fafc; font-family: 'Inter', sans-serif; }
+        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); }
+        .bulb-glow { transition: filter 0.3s ease; }
+        
+        .wire-container { position: relative; overflow: hidden; height: 10px; width: 100%; background: #334155; border-radius: 5px; margin: 20px 0; }
+        .electron { position: absolute; width: 8px; height: 8px; background: #60a5fa; border-radius: 50%; top: 1px; left: -10px; box-shadow: 0 0 8px #60a5fa; }
+        
+        @keyframes flow {
+            0% { left: -10px; }
+            100% { left: 100%; }
+        }
+        .animate-flow { animation: flow linear infinite; }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <div class="max-w-5xl mx-auto">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-yellow-400">옴의 법칙 탐구 실험실</h1>
+            <p class="text-slate-400">전압과 저항의 변화가 전자 이동과 전류에 미치는 영향을 관찰하세요.</p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-2 glass p-6 rounded-2xl border border-slate-700">
+                <div class="flex gap-4 mb-6">
+                    <button onclick="setMode('series')" id="btn-series" class="bg-blue-600 px-4 py-2 rounded-lg font-bold">직렬 회로</button>
+                    <button onclick="setMode('parallel')" id="btn-parallel" class="bg-slate-700 px-4 py-2 rounded-lg font-bold">병렬 회로</button>
+                </div>
+                
+                <div id="circuit-viz" class="h-64 flex flex-col items-center justify-center bg-slate-900 rounded-xl border border-slate-800 p-8">
+                    <div class="flex gap-12 mb-4">
+                        <div id="bulb1" class="w-16 h-16 rounded-full bg-slate-700 bulb-glow border-4 border-slate-600 shadow-lg"></div>
+                        <div id="bulb2" class="w-16 h-16 rounded-full bg-slate-700 bulb-glow border-4 border-slate-600 shadow-lg"></div>
+                    </div>
+                    <div class="wire-container">
+                        <div id="electron" class="electron"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass p-6 rounded-2xl border border-slate-700 space-y-6">
+                <div>
+                    <label class="block text-sm mb-2">전압 (V): <span id="vVal" class="text-yellow-400 font-bold">10</span>V</label>
+                    <input type="range" id="vSlider" min="1" max="50" value="10" class="w-full accent-yellow-400" oninput="updateCircuit()">
+                </div>
+                <div>
+                    <label class="block text-sm mb-2">저항 1 (Ω): <span id="r1Val" class="text-blue-400 font-bold">10</span>Ω</label>
+                    <input type="range" id="r1Slider" min="1" max="100" value="10" class="w-full accent-blue-400" oninput="updateCircuit()">
+                </div>
+                <div id="r2-control">
+                    <label class="block text-sm mb-2">저항 2 (Ω): <span id="r2Val" class="text-blue-400 font-bold">10</span>Ω</label>
+                    <input type="range" id="r2Slider" min="1" max="100" value="10" class="w-full accent-blue-400" oninput="updateCircuit()">
+                </div>
+                <div class="pt-4 border-t border-slate-700 text-center">
+                    <div class="text-2xl font-bold text-green-400" id="currentVal">0.00 A</div>
+                    <div class="text-sm text-slate-400">흐르는 전류 (I = V/R)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let mode = 'series';
+        const electron = document.getElementById('electron');
+
+        function setMode(m) {
+            mode = m;
+            document.getElementById('btn-series').className = mode === 'series' ? 'bg-blue-600 px-4 py-2 rounded-lg font-bold' : 'bg-slate-700 px-4 py-2 rounded-lg font-bold';
+            document.getElementById('btn-parallel').className = mode === 'parallel' ? 'bg-blue-600 px-4 py-2 rounded-lg font-bold' : 'bg-slate-700 px-4 py-2 rounded-lg font-bold';
+            updateCircuit();
+        }
+
+        function updateCircuit() {
+            const v = parseFloat(document.getElementById('vSlider').value);
+            const r1 = parseFloat(document.getElementById('r1Slider').value);
+            const r2 = parseFloat(document.getElementById('r2Slider').value);
+            
+            document.getElementById('vVal').innerText = v;
+            document.getElementById('r1Val').innerText = r1;
+            document.getElementById('r2Val').innerText = r2;
+
+            let totalR = mode === 'series' ? (r1 + r2) : (r1 * r2) / (r1 + r2);
+            let i = v / totalR;
+            
+            document.getElementById('currentVal').innerText = i.toFixed(2) + " A";
+            
+            // Animation logic based on current
+            const speed = Math.max(0.5, 5 - i/2);
+            electron.style.animationDuration = `${speed}s`;
+            electron.classList.add('animate-flow');
+            
+            const brightness = Math.min(i * 10, 100);
+            document.getElementById('bulb1').style.filter = `brightness(${1 + brightness/50}) drop-shadow(0 0 ${brightness/2}px #fbbf24)`;
+            document.getElementById('bulb2').style.filter = `brightness(${1 + brightness/50}) drop-shadow(0 0 ${brightness/2}px #fbbf24)`;
+        }
+        updateCircuit();
+    </script>
+</body>
+</html>
